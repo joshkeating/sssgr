@@ -1,2 +1,9 @@
 /target
 **/*.rs.bk
+
+in/res/favicon.ico
+in/style.css
+in/res/images/*
+in/res/pdfs/*
+in/posts/*
+out/*
