@@ -86,8 +86,7 @@ fn process_md(file_path: &str) -> io::Result<()> {
     println!("{}", header.date);
     println!("{}", header.summary);
 
-    // start dom handler
-
+    // build dom line by line
     let dom = create_base_dom("src/snippets/skeleton_flat.html");
 
     let doc_handle = &dom.document;
@@ -101,15 +100,16 @@ fn process_md(file_path: &str) -> io::Result<()> {
     let body_handle = &html_handle.children.borrow()[1];
     let main_handle = &body_handle.children.borrow()[1];
 
+    // set document header title node value from header metadata
+    populate_title(header.title.as_ref(), title_handle);
 
-    populate_title("my title", title_handle);
+    // add post title and date to document body using values from header metadata
+    populate_article_header(header.title.as_ref(), header.date.as_ref(), main_handle);
 
-    populate_article_header("Great Title!", "05/30/2020", main_handle);
-
+    // add node that will contain all visible content from md file
     add_article_node(main_handle);
 
     let article_handle = &main_handle.children.borrow()[1];
-
 
     // types of lines to process:
     // Text line, can include inline links or code snippets
@@ -388,51 +388,6 @@ fn create_alt_qualified_name() -> QualName {
         local_name!("alt")
     )
 }
-
-
-// fn parse_skelly() {
-
-    // let dom = create_base_dom("src/snippets/skeleton_flat.html");
-    //
-    // let doc_handle = &dom.document;
-    // let html_handle = &doc_handle.children.borrow()[1];
-    //
-    // // get head handle
-    // let head_handle = &html_handle.children.borrow()[0];
-    // let title_handle = &head_handle.children.borrow()[3];
-    //
-    // // get main handle
-    // let body_handle = &html_handle.children.borrow()[1];
-    // let main_handle = &body_handle.children.borrow()[1];
-    //
-    //
-    // populate_title("my title", title_handle);
-    //
-    // populate_article_header("Great Title!", "05/30/2020", main_handle);
-    //
-    // add_article_node(main_handle);
-    //
-    // let article_handler = &main_handle.children.borrow()[1];
-    // {
-    //     let mut tmp = article_handler.children.borrow_mut();
-    //     tmp.push(create_node_with_class_name("div", "theoretical-node"));
-    // }
-    //
-    // let child_handle = &article_handler.children.borrow()[0];
-    // {
-    //     let mut cur_child_content = child_handle.children.borrow_mut();
-    //     cur_child_content.push(Node::new(Text {contents: RefCell::new("example content".parse().unwrap())}));
-    // }
-    //
-    //
-    // let document: SerializableHandle = dom.document.clone().into();
-    // serialize(&mut io::stdout(), &document, Default::default())
-    //     .ok()
-    //     .expect("serialization failed");
-// }
-
-
-
 
 fn read_snippet_from_file(target: &str) -> String {
 
