@@ -126,11 +126,40 @@ fn process_md(file_path: &str) -> io::Result<()> {
 
         let line_res = line.unwrap();
 
-        if line_res.starts_with("![alt text]") {
+        if is_codeblock {
+            // currently in a codeblock, append entire line to codeblock content
+            codeblock_content.to_string().push_str(&line_res);
+
+        } else if line_res.starts_with("![alt text]") {
             // image
 
-        } else if line_res.starts_with("##") {
+            // get parts we care about for creating image node
+            let split_image_link: Vec<&str> = line_res.split(|c| c == '(' || c == '"').collect();
+            let file_path = split_image_link[1].trim();
+            let alt_text = split_image_link[2].trim();
+
+            {
+                let mut parent_handle = article_handle.children.borrow_mut();
+                parent_handle.push(create_img_node("img-responsive", file_path, alt_text));
+            }
+            lines_processed += 1;
+
+        } else if line_res.starts_with("## ") {
             // subheading
+
+            // strip preceding hashes
+            let header_text = line_res.trim_start_matches("## ");
+
+            {
+                let mut parent_handle = article_handle.children.borrow_mut();
+                parent_handle.push(create_node_with_class_name("h2", "post-subheading"));
+            }
+            {
+                let header_handle = &article_handle.children.borrow()[lines_processed];
+                let mut header_content = header_handle.children.borrow_mut();
+                header_content.push(Node::new(Text {contents: RefCell::new(header_text.parse().unwrap())}))
+            }
+            lines_processed += 1;
 
         } else if line_res.starts_with("```") {
             // code block
@@ -139,77 +168,69 @@ fn process_md(file_path: &str) -> io::Result<()> {
                 // done collecting code, reset values and process codeblock node
                 is_codeblock = false;
                 codeblock_content = "";
-
+                // process node here
             }
             is_codeblock = true;
 
-
-        } else {
-            if is_codeblock {
-                // currently in a codeblock, append entire line to codeblock content
-                codeblock_content.to_string().push_str(&line_res);
+        } else if line_res.trim() != "" {
+            // line is normal, process
+            {
+                let mut parent_handle = article_handle.children.borrow_mut();
+                parent_handle.push(create_node_no_class_name("p"));
             }
 
-            else if line_res.trim() != "" {
-                // line is normal, process
+            // TODO: pull this out to only create once
+            let re = Regex::new(r"(?P<code>`(.*?)`)|(?P<link>\[this]\(.+\))|(?P<words>[\w\s,.:']+)").unwrap();
 
-                {
-                    let mut parent_handle = article_handle.children.borrow_mut();
-                    parent_handle.push(create_node_no_class_name("p"));
-                }
+            let mut cur_index = 0;
+            for caps in re.captures_iter(line_res.as_ref()) {
+                if caps.name("code").is_some() {
+                    let content = &caps["code"];
 
-                    let re = Regex::new(r"(?P<code>`(.*?)`)|(?P<link>\[this]\(.+\))|(?P<words>[\w\s,.:']+)").unwrap();
-
-                    let mut cur_index = 0;
-                    for caps in re.captures_iter(line_res.as_ref()) {
-                        if caps.name("code").is_some() {
-                            let content = &caps["code"];
-
-                            let child_handle = &article_handle.children.borrow()[lines_processed];
-                            {
-                                let mut cur_child_content = child_handle.children.borrow_mut();
-                                cur_child_content.push(create_node_with_class_name("code", "inlinecode"));
-                            }
-
-                            let code_handle = &child_handle.children.borrow()[cur_index];
-                            {
-                                let mut code_content = code_handle.children.borrow_mut();
-                                code_content.push(Node::new(Text {contents: RefCell::new(content.parse().unwrap())}))
-                            }
-                        }
-                        if caps.name("link").is_some() {
-                            let raw_content = &caps["link"];
-                            let mut split_link: Vec<&str> = raw_content.split("(").collect();
-                            let link = split_link.pop();
-                            let id = split_link.pop();
-                            if link.is_some() && id.is_some() {
-                                let unbracketed_id = id.unwrap().trim_end_matches("]").trim_start_matches("[");
-
-                                let child_handle = &article_handle.children.borrow()[lines_processed];
-                                {
-                                    let mut cur_child_content = child_handle.children.borrow_mut();
-                                    cur_child_content.push(create_link_node("std-link", link.unwrap()));
-                                }
-
-                                let link_handle = &child_handle.children.borrow()[cur_index];
-                                {
-                                    let mut link_content = link_handle.children.borrow_mut();
-                                    link_content.push(Node::new(Text {contents: RefCell::new(unbracketed_id.parse().unwrap())}))
-                                }
-                            }
-                        }
-                        if caps.name("words").is_some() {
-                            let content = &caps["words"];
-                            let child_handle = &article_handle.children.borrow()[lines_processed];
-                            {
-                                let mut cur_child_content = child_handle.children.borrow_mut();
-                                cur_child_content.push(Node::new(Text {contents: RefCell::new(content.parse().unwrap())}));
-                            }
-                        }
-                        cur_index += 1;
+                    let child_handle = &article_handle.children.borrow()[lines_processed];
+                    {
+                        let mut cur_child_content = child_handle.children.borrow_mut();
+                        cur_child_content.push(create_node_with_class_name("code", "inlinecode"));
                     }
-                lines_processed += 1;
+
+                    let code_handle = &child_handle.children.borrow()[cur_index];
+                    {
+                        let mut code_content = code_handle.children.borrow_mut();
+                        code_content.push(Node::new(Text {contents: RefCell::new(content.parse().unwrap())}))
+                    }
+                }
+                if caps.name("link").is_some() {
+                    let raw_content = &caps["link"];
+                    let mut split_link: Vec<&str> = raw_content.split("(").collect();
+                    let link = split_link.pop();
+                    let id = split_link.pop();
+                    if link.is_some() && id.is_some() {
+                        let unbracketed_id = id.unwrap().trim_end_matches("]").trim_start_matches("[");
+
+                        let child_handle = &article_handle.children.borrow()[lines_processed];
+                        {
+                            let mut cur_child_content = child_handle.children.borrow_mut();
+                            cur_child_content.push(create_link_node("std-link", link.unwrap()));
+                        }
+
+                        let link_handle = &child_handle.children.borrow()[cur_index];
+                        {
+                            let mut link_content = link_handle.children.borrow_mut();
+                            link_content.push(Node::new(Text {contents: RefCell::new(unbracketed_id.parse().unwrap())}))
+                        }
+                    }
+                }
+                if caps.name("words").is_some() {
+                    let content = &caps["words"];
+                    let child_handle = &article_handle.children.borrow()[lines_processed];
+                    {
+                        let mut cur_child_content = child_handle.children.borrow_mut();
+                        cur_child_content.push(Node::new(Text {contents: RefCell::new(content.parse().unwrap())}));
+                    }
+                }
+                cur_index += 1;
             }
+            lines_processed += 1;
         }
     }
 
@@ -300,6 +321,24 @@ fn create_link_node(classname: &str, link: &str) -> Arc<Node> {
     })
 }
 
+fn create_img_node(classname: &str, src: &str, alt: &str) -> Arc<Node> {
+    Node::new(Element {
+        name: create_element_qualified_name("img"),
+        attrs: RefCell::new(vec![Attribute {
+            name: create_class_qualified_name(),
+            value: classname.parse().unwrap(),
+        },Attribute {
+            name: create_src_qualified_name(),
+            value: src.parse().unwrap(),
+        },Attribute {
+            name: create_alt_qualified_name(),
+            value: alt.parse().unwrap(),
+        }]),
+        template_contents: None,
+        mathml_annotation_xml_integration_point: false,
+    })
+}
+
 fn create_node_no_class_name(node_type: &str) -> Arc<Node> {
     Node::new(Element {
         name: create_element_qualified_name(node_type),
@@ -331,6 +370,22 @@ fn create_href_qualified_name() -> QualName {
         None,
         ns!(),
         local_name!("href")
+    )
+}
+
+fn create_src_qualified_name() -> QualName {
+    QualName::new(
+        None,
+        ns!(),
+        local_name!("src")
+    )
+}
+
+fn create_alt_qualified_name() -> QualName {
+    QualName::new(
+        None,
+        ns!(),
+        local_name!("alt")
     )
 }
 
