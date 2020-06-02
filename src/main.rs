@@ -34,9 +34,7 @@ fn main() {
     // parse file line by line, build dom from input
     // when done, serialize to output file
 
-    process_md("./in/posts/predict_airbnb_test.md");
-
-    // parse_skelly();
+    process_md("./in/posts/predict_airbnb.md");
 
 }
 
@@ -118,7 +116,7 @@ fn process_md(file_path: &str) -> io::Result<()> {
     // code block, started with ``` ended with ```
 
     let mut is_codeblock: bool = false;
-    let mut codeblock_content: &str = "";
+    let mut codeblock_content = "".to_string();
 
     let mut lines_processed = 0;
 
@@ -126,10 +124,34 @@ fn process_md(file_path: &str) -> io::Result<()> {
 
         let line_res = line.unwrap();
 
-        if is_codeblock {
-            // currently in a codeblock, append entire line to codeblock content
-            codeblock_content.to_string().push_str(&line_res);
+        if line_res.starts_with("```") || is_codeblock {
 
+            if line_res.starts_with("```") && !is_codeblock {
+                // beginning of codeblock
+                is_codeblock = true;
+            }
+            else if line_res.starts_with("```") && is_codeblock {
+                // end of codeblock: add node, reset values, and process
+
+                codeblock_content.pop(); // remove trailing newline char
+                {
+                    let mut parent_handle = article_handle.children.borrow_mut();
+                    parent_handle.push(create_node_with_class_name("pre", "codeblock"));
+                }
+                {
+                    let block_handle = &article_handle.children.borrow()[lines_processed];
+                    let mut block_content = block_handle.children.borrow_mut();
+                    block_content.push(Node::new(Text {contents: RefCell::new(codeblock_content.parse().unwrap())}))
+                }
+                lines_processed += 1;
+
+                is_codeblock = false;
+                codeblock_content = "".to_string();
+                // process node here
+            } else {
+                // in a codeblock, append entire line to current codeblock content with newline added
+                codeblock_content = format!("{}{}\n", codeblock_content, line_res);
+            }
         } else if line_res.starts_with("![alt text]") {
             // image
 
@@ -161,18 +183,7 @@ fn process_md(file_path: &str) -> io::Result<()> {
             }
             lines_processed += 1;
 
-        } else if line_res.starts_with("```") {
-            // code block
-
-            if is_codeblock {
-                // done collecting code, reset values and process codeblock node
-                is_codeblock = false;
-                codeblock_content = "";
-                // process node here
-            }
-            is_codeblock = true;
-
-        } else if line_res.trim() != "" {
+        }  else if line_res.trim() != "" {
             // line is normal, process
             {
                 let mut parent_handle = article_handle.children.borrow_mut();
