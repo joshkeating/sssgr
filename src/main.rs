@@ -79,10 +79,7 @@ fn process_md(file_path: &str) -> io::Result<()> {
 
     let header = Header { link, title, date, summary };
 
-    println!("{}", header.link);
-    println!("{}", header.title);
-    println!("{}", header.date);
-    println!("{}", header.summary);
+    println!("  -> Header processed successfully");
 
     // build dom line by line
     let dom = create_base_dom("src/snippets/skeleton_flat.html");
@@ -109,15 +106,9 @@ fn process_md(file_path: &str) -> io::Result<()> {
 
     let article_handle = &main_handle.children.borrow()[1];
 
-    // types of lines to process:
-    // Text line, can include inline links or code snippets
-    // subheader, prefixed with ##
-    // image, prefixed with ![alt text]
-    // code block, started with ``` ended with ```
-
     let mut is_codeblock: bool = false;
     let mut codeblock_content = "".to_string();
-
+    let re = Regex::new(r"(?P<code>`(.*?)`)|(?P<link>\[[\w\s]+]\([\w:.\-/]*\))|(?P<words>[\w\s,.:'\-]+)").unwrap();
     let mut lines_processed = 0;
 
     for line in lines_iter {
@@ -190,9 +181,6 @@ fn process_md(file_path: &str) -> io::Result<()> {
                 parent_handle.push(create_node_no_class_name("p"));
             }
 
-            // TODO: pull this out to only create once
-            let re = Regex::new(r"(?P<code>`(.*?)`)|(?P<link>\[this]\(.+\))|(?P<words>[\w\s,.:']+)").unwrap();
-
             let mut cur_index = 0;
             for caps in re.captures_iter(line_res.as_ref()) {
                 if caps.name("code").is_some() {
@@ -217,11 +205,11 @@ fn process_md(file_path: &str) -> io::Result<()> {
                     let id = split_link.pop();
                     if link.is_some() && id.is_some() {
                         let unbracketed_id = id.unwrap().trim_end_matches("]").trim_start_matches("[");
-
+                        let clean_link = link.unwrap().trim_end_matches(")");
                         let child_handle = &article_handle.children.borrow()[lines_processed];
                         {
                             let mut cur_child_content = child_handle.children.borrow_mut();
-                            cur_child_content.push(create_link_node("std-link", link.unwrap()));
+                            cur_child_content.push(create_link_node("std-link", clean_link));
                         }
 
                         let link_handle = &child_handle.children.borrow()[cur_index];
@@ -245,10 +233,19 @@ fn process_md(file_path: &str) -> io::Result<()> {
         }
     }
 
+    println!("  -> Finished building dom tree");
+    println!("  -> Significant lines of markdown parsed: [{}]", lines_processed);
+
+    // check ability to serialize, write document to new file in output
+    let out_path = format!("out/{}", header.link);
+    let mut buffer = File::create(out_path)?;
     let document: SerializableHandle = dom.document.clone().into();
-    serialize(&mut io::stdout(), &document, Default::default())
+    serialize(&mut buffer, &document, Default::default())
         .ok()
         .expect("serialization failed");
+
+    println!("  -> Dom tree serialized successfully");
+    println!("  -> Wrote to output file: [out/{}]", header.link);
 
     Ok(())
 }

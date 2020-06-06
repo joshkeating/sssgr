@@ -46,9 +46,10 @@ date: ''
 summary: ''
 }}
 
+## Markdown parsing
 
-would be cool to do a postproccessig pass with html5ever 
-
-got the parsed tree of the skelton, need to inject the posts and see more html
-
-write parser for markdown
+Types of lines to process:
+- Text line, can include inline links or code snippets
+- subheading, prefixed with ##
+- image, prefixed with \![alt text]
+- code block, started with "\```" ending with "\```"
