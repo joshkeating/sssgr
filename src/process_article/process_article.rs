@@ -9,15 +9,16 @@ use html5ever::{serialize};
 use regex::Regex;
 
 use crate::process_article::dom_helpers::*;
+use std::path::PathBuf;
 
 pub struct Header {
-    link: String,
-    title: String,
-    date: String,
-    summary: String,
+    pub link: String,
+    pub title: String,
+    pub date: String,
+    pub summary: String,
 }
 
-pub fn process_md(file_path: &str) -> io::Result<Header> {
+pub fn process_md(file_path: PathBuf) -> io::Result<Header> {
     let file = File::open(file_path)?;
     let reader = BufReader::new(file);
 
