@@ -9,6 +9,9 @@ extern crate markup5ever_arcdom as arcdom;
 use std::{fs, io};
 use std::path::Path;
 use std::collections::BTreeMap;
+use crate::process_article::Header;
+use std::borrow::{Borrow, BorrowMut};
+use crate::dom::build_index::build_index;
 
 // pull in modules
 mod dom;
@@ -37,11 +40,11 @@ fn main() {
 
     let sorted_metadata = process_all_md(input_dir).expect("Error in processing markdown");
 
-    println!("{}", sorted_metadata.len());
+    // create index from sorted_metadata
+    let meta_to_display: Vec<&Header> = sorted_metadata.values().clone().collect();
+    build_index(meta_to_display);
 
-    // iterate sorted_metadata list, building homepage
-
-    // as we process items in sorted_metadata, add them to the list of metadata that needs to be added to the index
+    // TODO: build archive from metadata
 }
 
 

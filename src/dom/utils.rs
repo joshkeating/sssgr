@@ -9,6 +9,7 @@ use arcdom::NodeData::{Element, Text};
 use html5ever::{parse_document};
 use html5ever::tendril::TendrilSink;
 use markup5ever::{Attribute, LocalName, QualName};
+use crate::process_article::Header;
 
 pub(crate) fn create_base_dom(base_html_skeleton: &str) -> ArcDom {
     let payload = read_snippet_from_file(base_html_skeleton);
@@ -58,6 +59,58 @@ pub(crate) fn populate_article_header(title: &str, date: &str, main_handle: &Arc
     {
         let mut date_content = date_handle.children.borrow_mut();
         date_content.push(Node::new(Text { contents: RefCell::new(date.parse().unwrap()) }));
+    }
+}
+
+
+pub(crate) fn add_article_card(metadata: &Header, main_handle: &Arc<Node>, index: usize) {
+
+    {
+        let mut main_content = main_handle.children.borrow_mut();
+        main_content.push(create_node_with_class_name("li", "article-card"));
+    }
+
+    let article_link = &main_handle.children.borrow()[index];
+    {
+        let mut content = article_link.children.borrow_mut();
+        content.push(create_link_node("article-card-link", metadata.link.as_str()));
+    }
+
+    let article_container = &article_link.children.borrow()[0];
+    {
+        let mut content = article_container.children.borrow_mut();
+        content.push(create_node_with_class_name("article", "article-card-container"));
+    }
+
+    let article_content = &article_container.children.borrow()[0];
+    {
+        let mut content = article_content.children.borrow_mut();
+        content.push(create_node_with_class_name("h3", "article-card-title"));
+        content.push(create_node_with_class_name("div", "article-card-date"));
+        content.push(create_node_with_class_name("p", "article-card-body"));
+    }
+
+    let card_title = &article_content.children.borrow()[0];
+    {
+        let mut content = card_title.children.borrow_mut();
+        content.push(create_node_no_class_name("span"));
+    }
+    let card_title_content = &card_title.children.borrow()[0];
+    {
+        let mut content = card_title_content.children.borrow_mut();
+        content.push(create_text_node(metadata.title.as_str()));
+    }
+
+    let card_date_content = &article_content.children.borrow()[1];
+    {
+        let mut content = card_date_content.children.borrow_mut();
+        content.push(create_text_node(metadata.date.as_str()));
+    }
+
+    let card_body_content = &article_content.children.borrow()[2];
+    {
+        let mut content = card_body_content.children.borrow_mut();
+        content.push(create_text_node(metadata.summary.as_str()));
     }
 }
 
@@ -113,6 +166,10 @@ pub(crate) fn create_node_no_class_name(node_type: &str) -> Arc<Node> {
         template_contents: None,
         mathml_annotation_xml_integration_point: false,
     })
+}
+
+fn create_text_node(value: &str) -> Arc<Node> {
+    Node::new(Text { contents: RefCell::new(value.parse().unwrap()) })
 }
 
 fn create_element_qualified_name(element_type: &str) -> QualName {
