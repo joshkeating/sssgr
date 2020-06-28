@@ -10,8 +10,6 @@ use html5ever::{parse_document};
 use html5ever::tendril::TendrilSink;
 use markup5ever::{Attribute, LocalName, QualName};
 
-
-
 pub(crate) fn create_base_dom(base_html_skeleton: &str) -> ArcDom {
     let payload = read_snippet_from_file(base_html_skeleton);
     // parse given tendril in one go
@@ -53,13 +51,13 @@ pub(crate) fn populate_article_header(title: &str, date: &str, main_handle: &Arc
     let title_handle = &container.children.borrow()[0];
     {
         let mut title_content = title_handle.children.borrow_mut();
-        title_content.push(Node::new(Text {contents: RefCell::new(title.parse().unwrap())}));
+        title_content.push(Node::new(Text { contents: RefCell::new(title.parse().unwrap()) }));
     }
 
     let date_handle = &container.children.borrow()[1];
     {
         let mut date_content = date_handle.children.borrow_mut();
-        date_content.push(Node::new(Text {contents: RefCell::new(date.parse().unwrap())}));
+        date_content.push(Node::new(Text { contents: RefCell::new(date.parse().unwrap()) }));
     }
 }
 
@@ -81,7 +79,7 @@ pub(crate) fn create_link_node(classname: &str, link: &str) -> Arc<Node> {
         attrs: RefCell::new(vec![Attribute {
             name: create_class_qualified_name(),
             value: classname.parse().unwrap(),
-        },Attribute {
+        }, Attribute {
             name: create_href_qualified_name(),
             value: link.parse().unwrap(),
         }]),
@@ -96,10 +94,10 @@ pub(crate) fn create_img_node(classname: &str, src: &str, alt: &str) -> Arc<Node
         attrs: RefCell::new(vec![Attribute {
             name: create_class_qualified_name(),
             value: classname.parse().unwrap(),
-        },Attribute {
+        }, Attribute {
             name: create_src_qualified_name(),
             value: src.parse().unwrap(),
-        },Attribute {
+        }, Attribute {
             name: create_alt_qualified_name(),
             value: alt.parse().unwrap(),
         }]),
@@ -122,7 +120,7 @@ fn create_element_qualified_name(element_type: &str) -> QualName {
     QualName::new(
         None,
         ns!(html),
-        LocalName::from(loc_name)
+        LocalName::from(loc_name),
     )
 }
 
@@ -130,7 +128,7 @@ fn create_class_qualified_name() -> QualName {
     QualName::new(
         None,
         ns!(),
-        local_name!("class")
+        local_name!("class"),
     )
 }
 
@@ -138,7 +136,7 @@ fn create_href_qualified_name() -> QualName {
     QualName::new(
         None,
         ns!(),
-        local_name!("href")
+        local_name!("href"),
     )
 }
 
@@ -146,7 +144,7 @@ fn create_src_qualified_name() -> QualName {
     QualName::new(
         None,
         ns!(),
-        local_name!("src")
+        local_name!("src"),
     )
 }
 
@@ -154,12 +152,11 @@ fn create_alt_qualified_name() -> QualName {
     QualName::new(
         None,
         ns!(),
-        local_name!("alt")
+        local_name!("alt"),
     )
 }
 
 fn read_snippet_from_file(target: &str) -> String {
-
     let mut data = String::new();
     let mut f = File::open(target).expect("Unable to open file");
     f.read_to_string(&mut data).expect("Unable to read string");

@@ -9,14 +9,16 @@ extern crate markup5ever_arcdom as arcdom;
 use std::{fs, io};
 use std::path::Path;
 use std::collections::BTreeMap;
-use std::borrow::Borrow;
 
 // pull in modules
+mod dom;
 mod utils;
 mod setup;
 mod process_article;
 
 fn main() {
+
+    let input_dir = "./in/posts/";
 
     setup::pre_process();
 
@@ -32,7 +34,6 @@ fn main() {
 
     // have two bTrees, one for processing the posts for the index, one for processing the all projects
 
-    let input_dir = "./in/posts/";
 
     let sorted_metadata = process_all_md(input_dir).expect("Error in processing markdown");
 
@@ -48,7 +49,7 @@ fn process_all_md(input_dir: &str, ) -> Result<BTreeMap<i32, process_article::He
 
     let mut sorted_metadata: BTreeMap<i32, process_article::Header> = BTreeMap::new();
 
-    // process all md files in $input_dir
+    // process all md files in input_dir
     for entry in fs::read_dir(Path::new(&input_dir))? {
         let entry = entry?;
         let input_path = entry.path();

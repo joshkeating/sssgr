@@ -1,5 +1,6 @@
 use std::cell::RefCell;
 use std::default::Default;
+use std::path::PathBuf;
 use std::fs::File;
 use std::io::{self};
 use std::io::{BufReader, prelude::*};
@@ -8,8 +9,7 @@ use arcdom::NodeData::{Text};
 use html5ever::{serialize};
 use regex::Regex;
 
-use crate::process_article::dom_helpers::*;
-use std::path::PathBuf;
+use crate::dom::utils::*;
 
 pub struct Header {
     pub link: String,
