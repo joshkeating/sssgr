@@ -12,6 +12,7 @@ use std::collections::BTreeMap;
 use crate::process_article::Header;
 use std::borrow::{Borrow, BorrowMut};
 use crate::dom::build_index::build_index;
+use crate::dom::build_archive::build_archive;
 
 // pull in modules
 mod dom;
@@ -33,19 +34,13 @@ fn main() {
     // when done, serialize to output file
 
     // process all md files in /in/posts/ adding their metadata to a sorted list (by date)
-    // process_article::process_md("./in/posts/predict_airbnb.md");
-    // process_article::process_md("./in/posts/average_gpa.md");
-
-    // have two bTrees, one for processing the posts for the index, one for processing the all projects
-
-
     let sorted_metadata = process_all_md(MARKDOWN_LOC).expect("Error in processing markdown");
 
-    // create index from sorted_metadata
+    // create index page from sorted_metadata
     let meta_to_display: Vec<&Header> = sorted_metadata.values().clone().collect();
     build_index(meta_to_display);
 
-    // TODO: build archive from metadata
+    build_archive(sorted_metadata.values().rev().collect());
 }
 
 

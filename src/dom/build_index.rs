@@ -29,8 +29,7 @@ pub(crate) fn build_index(mut cards_to_display: Vec<&Header>) -> std::io::Result
     let body_handle = &html_handle.children.borrow()[1];
     let main_handle = &body_handle.children.borrow()[1];
 
-    // set document header title node value from header metadata
-    populate_title("Joshua Keating", title_handle);
+    populate_title("Josh Keating", title_handle);
 
     // add cards
     for i in 0..HOMEPAGE_POST_COUNT {

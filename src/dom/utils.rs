@@ -123,13 +123,13 @@ pub(crate) fn add_see_all(main_handle: &Arc<Node>) {
     let see_all_link = &main_handle.children.borrow()[HOMEPAGE_POST_COUNT];
     {
         let mut content = see_all_link.children.borrow_mut();
-        content.push(create_link_node_no_class_name("all-projects.html"));
+        content.push(create_link_node_no_class_name("archive.html"));
     }
 
     let link_handle = &see_all_link.children.borrow()[0];
     {
         let mut link_content = link_handle.children.borrow_mut();
-        link_content.push(Node::new(Text {contents: RefCell::new("See all projects".parse().unwrap())}))
+        link_content.push(Node::new(Text {contents: RefCell::new("See all".parse().unwrap())}))
     }
 }
 
