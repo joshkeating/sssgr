@@ -11,7 +11,7 @@ use html5ever::{serialize};
 use regex::Regex;
 
 use crate::dom::utils::*;
-use crate::process_article;
+use crate::{process_article, HOMEPAGE_POST_COUNT};
 use crate::process_article::Header;
 
 pub(crate) fn build_index(mut cards_to_display: Vec<&Header>) -> std::io::Result<()> {
@@ -32,11 +32,13 @@ pub(crate) fn build_index(mut cards_to_display: Vec<&Header>) -> std::io::Result
     // set document header title node value from header metadata
     populate_title("Joshua Keating", title_handle);
 
-    for i in 0..5 {
+    // add cards
+    for i in 0..HOMEPAGE_POST_COUNT {
         add_article_card(cards_to_display.pop().unwrap(), main_handle, i);
     }
 
-    //TODO: add link to see all
+    // add link to post archive
+    add_see_all(main_handle);
 
     // check ability to serialize, write document to new file in output
     let out_path = format!("out/index.html");

@@ -19,9 +19,10 @@ mod utils;
 mod setup;
 mod process_article;
 
-fn main() {
+const MARKDOWN_LOC: &str = "./in/posts/";
+const HOMEPAGE_POST_COUNT: usize = 5;
 
-    let input_dir = "./in/posts/";
+fn main() {
 
     setup::pre_process();
 
@@ -38,7 +39,7 @@ fn main() {
     // have two bTrees, one for processing the posts for the index, one for processing the all projects
 
 
-    let sorted_metadata = process_all_md(input_dir).expect("Error in processing markdown");
+    let sorted_metadata = process_all_md(MARKDOWN_LOC).expect("Error in processing markdown");
 
     // create index from sorted_metadata
     let meta_to_display: Vec<&Header> = sorted_metadata.values().clone().collect();

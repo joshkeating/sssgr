@@ -10,6 +10,7 @@ use html5ever::{parse_document};
 use html5ever::tendril::TendrilSink;
 use markup5ever::{Attribute, LocalName, QualName};
 use crate::process_article::Header;
+use crate::HOMEPAGE_POST_COUNT;
 
 pub(crate) fn create_base_dom(base_html_skeleton: &str) -> ArcDom {
     let payload = read_snippet_from_file(base_html_skeleton);
@@ -64,7 +65,6 @@ pub(crate) fn populate_article_header(title: &str, date: &str, main_handle: &Arc
 
 
 pub(crate) fn add_article_card(metadata: &Header, main_handle: &Arc<Node>, index: usize) {
-
     {
         let mut main_content = main_handle.children.borrow_mut();
         main_content.push(create_node_with_class_name("li", "article-card"));
@@ -114,6 +114,25 @@ pub(crate) fn add_article_card(metadata: &Header, main_handle: &Arc<Node>, index
     }
 }
 
+pub(crate) fn add_see_all(main_handle: &Arc<Node>) {
+    {
+        let mut main_content = main_handle.children.borrow_mut();
+        main_content.push(create_node_with_class_name("div", "see-all"));
+    }
+
+    let see_all_link = &main_handle.children.borrow()[HOMEPAGE_POST_COUNT];
+    {
+        let mut content = see_all_link.children.borrow_mut();
+        content.push(create_link_node_no_class_name("all-projects.html"));
+    }
+
+    let link_handle = &see_all_link.children.borrow()[0];
+    {
+        let mut link_content = link_handle.children.borrow_mut();
+        link_content.push(Node::new(Text {contents: RefCell::new("See all projects".parse().unwrap())}))
+    }
+}
+
 pub(crate) fn create_node_with_class_name(node_type: &str, classname: &str) -> Arc<Node> {
     Node::new(Element {
         name: create_element_qualified_name(node_type),
@@ -133,6 +152,18 @@ pub(crate) fn create_link_node(classname: &str, link: &str) -> Arc<Node> {
             name: create_class_qualified_name(),
             value: classname.parse().unwrap(),
         }, Attribute {
+            name: create_href_qualified_name(),
+            value: link.parse().unwrap(),
+        }]),
+        template_contents: None,
+        mathml_annotation_xml_integration_point: false,
+    })
+}
+
+pub(crate) fn create_link_node_no_class_name(link: &str) -> Arc<Node> {
+    Node::new(Element {
+        name: create_element_qualified_name("a"),
+        attrs: RefCell::new(vec![Attribute {
             name: create_href_qualified_name(),
             value: link.parse().unwrap(),
         }]),
