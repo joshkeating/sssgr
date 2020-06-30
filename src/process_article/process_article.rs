@@ -217,7 +217,7 @@ pub fn process_md(file_path: PathBuf) -> io::Result<Header> {
         .expect("serialization failed");
 
     println!("  -> Dom tree serialized successfully");
-    println!("  -> Wrote to output file: [out/{}]", header.link);
+    println!("==> Wrote to output file: [out/{}]", header.link);
 
     Ok(header)
 }

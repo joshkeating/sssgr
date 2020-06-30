@@ -25,9 +25,8 @@ pub(crate) fn build_archive(cards_to_display: Vec<&Header>) -> std::io::Result<(
     for (i, card) in cards_to_display.iter().enumerate() {
         add_article_card(card, main_handle, i);
     }
-    // for i in 0..HOMEPAGE_POST_COUNT {
-    //     add_article_card(cards_to_display.pop().unwrap(), main_handle, i);
-    // }
+
+    println!("  -> Finished building dom tree");
 
     // check ability to serialize, write document to new file in output
     let out_path = format!("out/archive.html");
@@ -36,6 +35,9 @@ pub(crate) fn build_archive(cards_to_display: Vec<&Header>) -> std::io::Result<(
     serialize(&mut buffer, &document, Default::default())
         .ok()
         .expect("serialization failed");
+
+    println!("  -> Dom tree serialized successfully");
+    println!("==> Wrote to output file: [out/archive.html]");
 
     Ok(())
 }

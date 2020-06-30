@@ -9,7 +9,7 @@ extern crate markup5ever_arcdom as arcdom;
 use std::{fs, io};
 use std::path::Path;
 use std::collections::BTreeMap;
-use crate::process_article::Header;
+use crate::process_article::Header as Header;
 use crate::dom::build_index::build_index;
 use crate::dom::build_archive::build_archive;
 
@@ -23,26 +23,34 @@ const MARKDOWN_LOC: &str = "./in/posts/";
 const HOMEPAGE_POST_COUNT: usize = 5;
 
 fn main() {
-
+    println!(":: Setting up...");
     setup::pre_process();
+    println!();
 
-    // process all md files in /in/posts/ adding their metadata to a sorted list (by date)
-    let sorted_metadata = process_all_md(MARKDOWN_LOC)
+    println!(":: Processing all markdown...");
+    // process all md files in MARKDOWN_LOC adding their metadata to a sorted list (by date)
+    let sorted_metadata: BTreeMap<i32, Header>  = process_all_md(MARKDOWN_LOC)
         .expect("Error in processing markdown");
+    println!();
 
+    println!(":: Building index page...");
     // create index page from sorted_metadata
     let meta_to_display: Vec<&Header> = sorted_metadata.values().clone().collect();
     build_index(meta_to_display)
         .expect("Error building index");
+    println!();
 
+    println!(":: Building archive page...");
     build_archive(sorted_metadata.values().rev().collect())
         .expect("Error building archive");
+    println!();
+    println!("Site built successfully!");
 }
 
 
-fn process_all_md(input_dir: &str) -> Result<BTreeMap<i32, process_article::Header>, io::Error> {
+fn process_all_md(input_dir: &str) -> Result<BTreeMap<i32, Header>, io::Error> {
 
-    let mut sorted_metadata: BTreeMap<i32, process_article::Header> = BTreeMap::new();
+    let mut sorted_metadata: BTreeMap<i32, Header> = BTreeMap::new();
 
     // process all md files in input_dir
     for entry in fs::read_dir(Path::new(&input_dir))? {

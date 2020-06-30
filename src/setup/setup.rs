@@ -2,12 +2,15 @@ use std::fs;
 use std::path::Path;
 
 pub fn pre_process() {
+    println!("==> Creating output directories...");
     let output_dirs = build_output_structure();
     output_dirs.expect("failed create output directories!");
 
+    println!("==> Validating structure of input files...");
     let input_files = validate_input_files();
     input_files.expect("input file structure incorrect!");
 
+    println!("==> Copying static input files into place...");
     let copied_files = copy_static_input_files();
     copied_files.expect("failed to copy static input files!");
 }
