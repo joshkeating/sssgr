@@ -1,4 +1,8 @@
-# Simple Site Generator Rust (ssgr)
+# Simple Static Site Generator Rust (sssgr)
+
+## TODO:
+
+explain how this thing works 
 
 ## Layout
 
@@ -6,7 +10,7 @@
 /ssgr
     /src
     /target
-    /out     (where the html output is going to go)
+    /out     (where the html output and other files go)
     /in      (where the input files go)
         /res
             /images
@@ -15,36 +19,6 @@
         /posts
         style.css
 ```
-
-## Things that need to work: 
-
- - something to generate the skelton of each page
-> have the raw html for the page skelton 
- - something to generate the "special case" pages (index, all projects)
- - markdown parser (convert `.md` files to `.html` files)
-
-## Things that need to be thought about:
-
- - how to decide what posts are going to be on the index page (and how they are ordered)
-    * I think that chronological is the right answer, I'll need something similar for the all projects page as well
-
-
-functions that are apparent:
-    - generate page skeleton
-    - generate card
-    - inject card breakup
-    - inject html from md
-    - 
-
-
-## Sample post metadata section
-
-{{
-document_link: ''
-document_title: ''
-date: ''
-summary: ''
-}}
 
 ## Markdown parsing
 
