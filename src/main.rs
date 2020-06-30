@@ -47,7 +47,6 @@ fn main() {
     println!("Site built successfully!");
 }
 
-
 fn process_all_md(input_dir: &str) -> Result<BTreeMap<i32, Header>, io::Error> {
 
     let mut sorted_metadata: BTreeMap<i32, Header> = BTreeMap::new();
