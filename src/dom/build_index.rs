@@ -1,17 +1,9 @@
-use std::cell::RefCell;
 use std::default::Default;
-use std::path::PathBuf;
 use std::fs::File;
-use std::io::{self};
-use std::io::{BufReader, prelude::*};
-use std::collections::BTreeMap;
-use arcdom::{ Node, SerializableHandle};
-use arcdom::NodeData::{Text};
+use arcdom::{ SerializableHandle};
 use html5ever::{serialize};
-use regex::Regex;
-
 use crate::dom::utils::*;
-use crate::{process_article, HOMEPAGE_POST_COUNT};
+use crate::{HOMEPAGE_POST_COUNT};
 use crate::process_article::Header;
 
 pub(crate) fn build_index(mut cards_to_display: Vec<&Header>) -> std::io::Result<()> {

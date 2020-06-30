@@ -3,7 +3,6 @@ use std::default::Default;
 use std::fs::File;
 use std::io::Read;
 use std::sync::Arc;
-
 use arcdom::{ArcDom, Node};
 use arcdom::NodeData::{Element, Text};
 use html5ever::{parse_document};

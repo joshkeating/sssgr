@@ -10,7 +10,6 @@ use std::{fs, io};
 use std::path::Path;
 use std::collections::BTreeMap;
 use crate::process_article::Header;
-use std::borrow::{Borrow, BorrowMut};
 use crate::dom::build_index::build_index;
 use crate::dom::build_archive::build_archive;
 
@@ -27,24 +26,21 @@ fn main() {
 
     setup::pre_process();
 
-    // read from in/posts
-    // need a struct that takes all the metadata from the header
-    // add metadata to hashmap that will keep track of all posts
-    // parse file line by line, build dom from input
-    // when done, serialize to output file
-
     // process all md files in /in/posts/ adding their metadata to a sorted list (by date)
-    let sorted_metadata = process_all_md(MARKDOWN_LOC).expect("Error in processing markdown");
+    let sorted_metadata = process_all_md(MARKDOWN_LOC)
+        .expect("Error in processing markdown");
 
     // create index page from sorted_metadata
     let meta_to_display: Vec<&Header> = sorted_metadata.values().clone().collect();
-    build_index(meta_to_display);
+    build_index(meta_to_display)
+        .expect("Error building index");
 
-    build_archive(sorted_metadata.values().rev().collect());
+    build_archive(sorted_metadata.values().rev().collect())
+        .expect("Error building archive");
 }
 
 
-fn process_all_md(input_dir: &str, ) -> Result<BTreeMap<i32, process_article::Header>, io::Error> {
+fn process_all_md(input_dir: &str) -> Result<BTreeMap<i32, process_article::Header>, io::Error> {
 
     let mut sorted_metadata: BTreeMap<i32, process_article::Header> = BTreeMap::new();
 

@@ -1,20 +1,11 @@
-use std::cell::RefCell;
 use std::default::Default;
-use std::path::PathBuf;
 use std::fs::File;
-use std::io::{self};
-use std::io::{BufReader, prelude::*};
-use std::collections::BTreeMap;
-use arcdom::{ Node, SerializableHandle};
-use arcdom::NodeData::{Text};
+use arcdom::{ SerializableHandle};
 use html5ever::{serialize};
-use regex::Regex;
-
 use crate::dom::utils::*;
-use crate::{process_article, HOMEPAGE_POST_COUNT};
 use crate::process_article::Header;
 
-pub(crate) fn build_archive(mut cards_to_display: Vec<&Header>) -> std::io::Result<()> {
+pub(crate) fn build_archive(cards_to_display: Vec<&Header>) -> std::io::Result<()> {
 
     let dom = create_base_dom("src/snippets/skeleton_flat.html");
 
