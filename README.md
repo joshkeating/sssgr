@@ -1,6 +1,6 @@
 # Simple Static Site Generator Rust (sssgr)
 
-Builds my website from a directory of markdown files. Each markdown file contains the content for a single page or "post". For each file of markdown, a `.html` page is generated.
+Builds my [website](https://joshuakeating.com/) from a directory of markdown files. Each markdown file contains the content for a single page or "post". For each file of markdown, a `.html` page is generated.
 
 This is mostly a product of me getting tired of manually formatting something I wrote for the site. The simple layout and design of the outputted site definitely makes this a little easier. 
 
