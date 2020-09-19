@@ -157,6 +157,7 @@ pub fn process_md(file_path: PathBuf) -> io::Result<Header> {
             for caps in re.captures_iter(line_res.as_ref()) {
                 if caps.name("code").is_some() {
                     let content = &caps["code"];
+                    let content_raw = content.trim_end_matches("`").trim_start_matches("`");
 
                     let child_handle = &article_handle.children.borrow()[lines_processed];
                     {
@@ -167,7 +168,7 @@ pub fn process_md(file_path: PathBuf) -> io::Result<Header> {
                     let code_handle = &child_handle.children.borrow()[cur_index];
                     {
                         let mut code_content = code_handle.children.borrow_mut();
-                        code_content.push(Node::new(Text {contents: RefCell::new(content.parse().unwrap())}))
+                        code_content.push(Node::new(Text {contents: RefCell::new(content_raw.parse().unwrap())}))
                     }
                 }
                 if caps.name("link").is_some() {
