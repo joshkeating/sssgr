@@ -162,7 +162,7 @@ pub fn process_md(file_path: PathBuf) -> io::Result<Header> {
                     let child_handle = &article_handle.children.borrow()[lines_processed];
                     {
                         let mut cur_child_content = child_handle.children.borrow_mut();
-                        cur_child_content.push(create_node_with_class_name("code", "inlinecode"));
+                        cur_child_content.push(create_node_with_class_name("code", "inline-code"));
                     }
 
                     let code_handle = &child_handle.children.borrow()[cur_index];

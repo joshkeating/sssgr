@@ -22,7 +22,7 @@ fn build_output_structure() -> std::io::Result<()> {
         fs::remove_dir_all("./out")?;
     }
 
-    // create output dir and required subdirs
+    // create output dir and required sub-directories
     fs::create_dir_all("./out/res")?;
     fs::create_dir("./out/res/images")?;
     fs::create_dir("./out/res/pdfs")?;
