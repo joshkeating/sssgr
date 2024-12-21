@@ -20,7 +20,7 @@ mod setup;
 mod process_article;
 
 const MARKDOWN_LOC: &str = "./in/posts/";
-const HOMEPAGE_POST_COUNT: usize = 5;
+const HOMEPAGE_POST_COUNT: usize = 4;
 
 fn main() {
     println!(":: Setting up...");
