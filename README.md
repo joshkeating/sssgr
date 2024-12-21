@@ -1,6 +1,6 @@
 # Simple Static Site Generator Rust (sssgr)
 
-Builds my [website](https://joshuakeating.com/) from a directory of markdown files. Each markdown file contains the content for a single page or "post". For each file of markdown, a `.html` page is generated.
+Builds my [website](https://www.joshuakeating.com/) from a directory of markdown files. Each markdown file contains the content for a single page or "post". For each file of markdown, a `.html` page is generated.
 
 This is mostly a product of me getting tired of manually formatting something I wrote for the site. The simple layout and design of the outputted site definitely makes this a little easier. 
 
@@ -65,12 +65,12 @@ The program expects a particular input file structure and will generate a set ou
 The current list of markdown that is supported is limited, but allows for a functional page layout:
 
 - Text line, can include inline links or code snippets
-- Subheading, prefixed with ##
-- Image, prefixed with \![alt text]
-- Code block, started with "\```" ending with "\```"
+- Subheading, prefixed with `##`
+- Image, prefixed with `\![alt text]`
+- Code block, started with `"\```"` ending with `"\```"`
 
 ### TODO
-- More flexible i/o options (eg. provide custom input path at runtime)
+- More flexible i/o options (e.g. provide custom input path at runtime)
 - Wider markdown support
 - Reduce standard dom tree building code redundancy
 - Hook into AWS for auto push of updates
